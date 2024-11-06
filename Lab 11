@@ -1,0 +1,290 @@
+TITLE CONVERTEBASE
+.MODEL SMALL
+.STACK 100h 
+pulalinha macro
+              push ax
+              push dx
+              mov  ah,2
+              mov  dl,10
+              int  21h
+              mov  ah,2
+              mov  dl,13
+              int  21h
+              push dx
+              push ax
+endm
+.DATA
+    msgbase    db "Digite a inicial da base de entrada:$"
+    msgpedeent db "Digite o numero de entrada:$"
+    msgsaida   db "Digite a inicial da base de saida:$"
+    msgres     db "O numero e igual a:$"
+.CODE
+MAIN PROC
+                  mov       ax,@data
+                  mov       ds,ax
+                  call      perguntabase
+                  cmp       al,'d'
+                  je        decimalentra
+                  cmp       al,'h'
+                  je        hexaentra
+                  call      entbin
+                  jmp       saidaa
+    decimalentra: 
+                  call      entdec
+                  jmp       saidaa
+    hexaentra:    
+                  call      enthex
+    saidaa:       
+                  call      perguntasaida
+                  cmp       bh,'d'
+                  je        saidaedec
+                  cmp       bh,'h'
+                  je        saidaehex
+                  call      saibin
+                  jmp       final
+    saidaedec:    
+                  call      saidec
+                  jmp       final
+    saidaehex:    
+                  call      saihex
+    final:        
+                  mov       ah,4ch
+                  int       21h
+MAIN ENDP
+perguntabase proc
+                  mov       ah,9
+                  lea       dx,msgbase
+                  int       21h
+                  mov       ah,1
+                  int       21h
+                  ret
+perguntabase endp
+entbin proc
+                  cmp       bx,2
+                  je        digitabin
+                  jmp       fimentbin
+    digitabin:    
+
+                  MOV       CX,16            ;inicializa contador de dígitos
+                  XOR       BX,BX            ;zera BX -> terá o resultado
+                  MOV       AH,1h            ;função DOS para entrada pelo teclado
+                  INT       21h              ;entra, caractere está no AL
+    ;while
+    TOPO:         CMP       AL,0Dh           ;é CR?
+                  JE        fimentbin        ;se sim, termina o WHILE
+                  AND       AL,0Fh           ;se não, elimina 30h do caractere
+                  SHL       BL,1             ;abre espaço para o novo dígito
+                  OR        BL,AL            ;insere o dígito no LSB de BL
+                  INT       21h              ;entra novo caractere
+                  LOOP      TOPO             ;controla o máximo de 16 dígitos
+    ;end_while
+    fimentbin:    
+                  ret
+entbin endp
+entdec proc
+                  cmp       bx,1
+                  je        digitadec
+                  jmp       fimentdec
+    digitadec:    
+    ; lê um numero entre -32768 A 32767
+    ; entrada nenhuma
+    ; saída numero em AX
+                  PUSH      BX
+                  PUSH      CX
+                  PUSH      DX
+@INICIO:
+    ; imprime prompt ?
+                  MOV       AH,2
+                  MOV       DL,'?'
+                  INT       21H              ; imprime ?
+    ;  total = 0
+                  XOR       BX,BX
+
+    ; negativo = falso
+                  XOR       CX,CX
+
+    ; le caractere
+                  MOV       AH,1
+                  INT       21H
+
+    ; case caractere lido eh?
+                  CMP       AL,'-'
+                  JE        @NEGT
+                  CMP       AL,'+'
+                  JE        @POST
+                  JMP       @REP2
+@NEGT:
+                  MOV       CX,1
+@POST:
+                  INT       21H
+    ;end case
+@REP2:
+    ; if caractere esta entre 0 e 9
+                  CMP       AL, '0'
+                  JNGE      @NODIG
+                  CMP       AL, '9'
+                  JNLE      @NODIG
+    ; converte caractere em digito
+                  AND       AX,000FH
+                  PUSH      AX
+    ; total = total X 10 + digito
+                  MOV       AX,10
+                  MUL       BX               ; AX = total X 10
+                  POP       BX
+                  ADD       BX,AX            ; total - total X 10 + digito
+    ; le caractere
+                  MOV       AH,1
+                  INT       21H
+                  CMP       AL,13            ;CR ?
+                  JNE       @REP2            ; não, continua
+    ; ate CR
+                  MOV       AX,BX            ; guarda numero em AX
+    ; se negativo
+                  OR        CX,CX            ; negativo ?
+                  JE        @SAI             ; sim, sai
+    ; entao
+                  NEG       AX
+    ; end if
+                  jmp       @sai
+@NODIG:
+    ; se caractere ilegal
+                  MOV       AH,2
+                  MOV       DL, 0DH
+                  INT       21H
+                  MOV       DL, 0AH
+                  INT       21H
+                  JMP       @INICIO
+@SAI:
+                  POP       DX               ; restaura registradores
+                  POP       CX
+                  POP       BX
+    fimentdec:    
+                  RET                        ; retorna
+entdec endp
+enthex proc
+                  cmp       bx,3
+                  je        digitahex
+                  jmp       fimenthex
+    digitahex:    
+                  XOR       BX,BX            ;inicializa BX com zero
+                  MOV       CL,4             ;inicializa contador com 4
+                  MOV       CH,4
+                  MOV       AH,1h            ;prepara entrada pelo teclado
+                  INT       21h
+    ;WHILE
+    TOPOHEX:      
+                  CMP       AL,0Dh           ;? o CR ?
+                  JE        SAI
+                  CMP       AL, 39h          ;caracter n?mero ou letra?
+                  JA        LETRA            ;caracter j? est? na faixa ASCII
+                  AND       AL,0Fh           ;n?mero: retira 30h do ASCII
+                  JMP       DESL
+    LETRA:        SUB       AL,37h           ;converte letra para bin?rio
+    DESL:         SHL       BX,CL            ;desloca BX 4 casas ? esquerda
+                  OR        BL,AL            ;insere valor nos bits 0 a 3 de BX
+                  DEC       CH
+                  INT       21H
+                  JNZ       TOPOHEX          ;faz o la?o 4 VEZES
+    ;end_while
+    SAI:          
+    fimenthex:    
+                  ret
+enthex endp
+perguntasaida proc
+                  pulalinha
+                  push      ax
+                  mov       ah,9
+                  lea       dx,msgsaida
+                  int       21h
+
+                  mov       ah,1
+                  int       21h
+                  mov       bh,al
+                  pop       ax
+                  ret
+perguntasaida endp
+saibin proc
+
+
+                  ret
+saibin endp
+saidec proc
+                  cmp       ax,1
+                  je        decimal
+                  jmp       fimsaidec
+    decimal:      
+    ; imprime numero decimal sinalizado em AX
+    ; entrada AX
+    ; saida nenhuma
+                  PUSH      AX
+                  PUSH      BX
+                  PUSH      CX
+                  PUSH      DX
+    ; if AX < 0
+                  OR        AX,AX            ; AX < 0 ?
+                  JGE       @END_IF1
+    ;then
+                  PUSH      AX               ;salva o numero
+                  MOV       DL, '-'
+                  MOV       AH,2
+                  INT       21H              ; imprime -
+                  POP       AX               ; restaura numero
+                  NEG       AX
+
+    ; digitos decimais
+@END_IF1:
+                  XOR       CX,CX            ; contador de d?gitos
+                  MOV       BX,10            ; divisor
+@REP1:
+                  XOR       DX,DX            ; prepara parte alta do dividendo
+                  DIV       BX               ; AX = quociente   DX = resto
+                  PUSH      DX               ; salva resto na pilha
+                  INC       CX               ; contador = contador +1
+
+    ;until
+                  OR        AX,AX            ; quociente = 0?
+                  JNE       @REP1            ; nao, continua
+
+    ; converte digito em caractere
+                  MOV       AH,2
+
+    ; for contador vezes
+@IMP_LOOP:
+                  POP       DX               ; digito em DL
+                  OR        DL,30H
+                  INT       21H
+                  LOOP      @IMP_LOOP
+    ; fim do for
+
+                  POP       DX
+                  POP       CX
+                  POP       BX
+                  POP       AX
+    fimsaidec:    
+                  ret
+saidec endp
+saihex proc
+    ;BX j? contem n?mero bin?rio
+                  MOV       CH,4             ;CH contador de caracteres hexa
+                  MOV       CL,4             ;CL contador de delocamentos
+                  MOV       AH,2h            ;prepara exibi??o no monitor
+    ;for 4 vezes do
+    TOPO1:        MOV       DL,BH            ;captura em DL os oito bits mais significativos de BX
+                  SHR       DL,CL            ;resta em DL os 4 bits mais significativos de BX
+    ;if DL , 10
+                  CMP       DL, 0Ah          ;testa se ? letra ou n?mero
+                  JAE       LETRA1
+    ;then
+                  ADD       DL,30h           ;? n?mero: soma-se 30h
+                  JMP       PT1
+    ;else
+    LETRA1:       ADD       DL,37h           ;ao valor soma-se 37h -> ASCII
+    ;end_if
+    PT1:          INT       21h              ;exibe
+                  ROL       BX,CL            ;roda BX 4 casas para a direita
+                  DEC       CH
+                  JNZ       TOPO1            ;faz o FOR 4 vezes
+    ;end_for
+                  ret
+saihex endp
+END MAIN 
