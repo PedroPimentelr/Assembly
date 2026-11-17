@@ -1,44 +1,44 @@
-# Assembly x86 — Computer Organization
+# Assembly x86: Organização de Sistemas de Computação
 
-Academic exercises and projects developed for **Computer Organization / Computer Systems Organization** coursework at **PUC-Campinas**.
+Exercícios e projetos desenvolvidos na disciplina de **Organização de Sistemas de Computação** na **PUC-Campinas**.
 
-This repository contains **16-bit x86 Assembly** programs covering registers, memory access, arithmetic, control flow, procedures, and low-level input/output through DOS interrupts.
+O repositório reúne programas em **Assembly x86 de 16 bits** sobre registradores, acesso à memória, aritmética, controle de fluxo, procedimentos e entrada e saída de baixo nível com interrupções do DOS.
 
-## Featured project: Battleship (Batalha Naval)
+## Projeto em destaque: Batalha Naval
 
-**[View the source code](./Batalha%20Naval/batalha_naval.asm)**
+**[Ver o código-fonte](./Batalha%20Naval/batalha_naval.asm)**
 
-A console-based Battleship game written in Assembly. The source includes:
+Jogo de Batalha Naval no console, escrito em Assembly. O código inclui:
 
-- A **20 × 20 board** represented in memory.
-- Several ship layouts selected using a timer-based value.
-- Keyboard input for shot coordinates.
-- Procedures to initialize the game, display the board, process shots, and handle the end of the game.
+- **Tabuleiro de 20 × 20** representado em memória.
+- Várias disposições de navios, escolhidas a partir de um valor do relógio.
+- Leitura das coordenadas do tiro pelo teclado.
+- Procedimentos para iniciar o jogo, exibir o tabuleiro, processar os tiros e tratar o fim da partida.
 
-## Laboratory exercises
+## Exercícios de laboratório
 
-| Folder | Focus |
+| Pasta | Conteúdo |
 | --- | --- |
-| [Lab 01](./Lab%2001) | Basic data declarations and text output |
-| [Lab 05](./Lab%2005) | Assembly exercises |
-| [Lab 06](./Lab%2006) | Assembly exercises |
-| [Lab 07](./Lab%2007) | Arithmetic and input/output routines |
-| [Lab 08](./Lab%2008) | Numeric input and hexadecimal manipulation |
-| [Lab 09](./Lab%2009) | Assembly exercises |
-| [Lista OSC 2](./Lista%20OSC%202) | Course exercise solutions |
+| [Lab 01](./Lab%2001) | Declaração de dados e saída de texto |
+| [Lab 05](./Lab%2005) | Exercícios de Assembly |
+| [Lab 06](./Lab%2006) | Exercícios de Assembly |
+| [Lab 07](./Lab%2007) | Rotinas de aritmética e entrada e saída |
+| [Lab 08](./Lab%2008) | Leitura de números e manipulação em hexadecimal |
+| [Lab 09](./Lab%2009) | Exercícios de Assembly |
+| [Lista OSC 2](./Lista%20OSC%202) | Resolução dos exercícios da disciplina |
 
-The repository also contains other course material and exercises.
+O repositório também contém outros materiais e exercícios da disciplina.
 
-## Technologies and concepts
+## Tecnologias e conceitos
 
-- **Language:** x86 Assembly (16-bit)
-- **Execution style:** DOS programs using interrupts such as `INT 21h`
-- **Concepts:** CPU registers, memory addressing, arithmetic, jumps, loops, procedures, and console I/O
+- **Linguagem:** Assembly x86 (16 bits)
+- **Execução:** programas DOS com interrupções como `INT 21h`
+- **Conceitos:** registradores, endereçamento de memória, aritmética, saltos, laços, procedimentos e entrada e saída no console
 
-> **Note:** This is an educational repository. Running these programs may require a 16-bit x86 assembler and a compatible DOS or emulator environment. The repository does not include an automated test suite.
+> **Observação:** este é um repositório educacional. Para executar os programas, é preciso um montador x86 de 16 bits e um ambiente DOS ou emulador compatível. O repositório não tem testes automatizados.
 
-## Author
+## Autor
 
 **Pedro Pimentel Rodrigues**  
-Computer Engineering — PUC-Campinas  
+Engenharia de Computação, PUC-Campinas  
 [GitHub](https://github.com/PedroPimentelr) · [LinkedIn](https://www.linkedin.com/in/pedropimentelrodrigues)
